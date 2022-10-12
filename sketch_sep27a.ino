@@ -22,6 +22,7 @@
 #include <Adafruit_GFX.h>          //https://github.com/adafruit/Adafruit-GFX-Library
 #include <Adafruit_SSD1306.h>      //https://github.com/adafruit/Adafruit_SSD1306
 #include <Adafruit_Fingerprint.h>  //https://github.com/adafruit/Adafruit-Fingerprint-Sensor-Library
+#include <ArduinoJson.h>
 //************************************************************************
 //Fingerprint scanner Pins
 #define Finger_Rx 14 //D5
@@ -41,7 +42,8 @@ const char *password = "faris12345";
 //************************************************************************
 String postData ; // post array that will be send to the website
 String putData ; // put array that will be send to the website
-String link = "http://192.168.144.29/biometricattendance/getdata.php"; //computer IP or the server domain
+// String link = "http://192.168.144.29/biometricattendance/getdata.php"; //computer IP or the server domain
+String link = "https://polisi-strapi.herokuapp.com/api/fingerprint"; //computer IP or the server domain
 String link2 = "https://polisi-strapi.herokuapp.com/api/fingerprint";
 int FingerID = 0;     // The Fingerprint ID from the scanner
 uint8_t id;
@@ -614,30 +616,37 @@ WiFiClient wifiClient;
 
 void SendFingerprintID( int finger ) {
 
+  StaticJsonBuffer<200> jsonBuffer;
   HTTPClient http;    //Declare object of class HTTPClient
-  HTTPClient http2;    //Declare object of class HTTPClient
+  // HTTPClient http2;    //Declare object of class HTTPClient
   //Post Data
+  JsonObject& root = jsonBuffer.createObject();
+  JsonObject& data = root.createNestedObject("data");
+  data["fp_id"] = finger;
+  root.printTo(Serial);
+  char json_str[100];
+  root.prettyPrintTo(json_str, sizeof(json_str));
   postData = "FingerID=" + String(finger); // Add the Fingerprint ID to the Post array in order to send it
   putData = "{\"data\": {\"fp_id\": \"" + String(finger) + "\"}}"; // Add the Fingerprint ID to the Post array in order to send it
 
   //  WiFiClient client;
-  http.begin(wifiClient,link); //initiate HTTP request, put your Website URL or Your Computer IP
-  http.addHeader("Content-Type", "application/x-www-form-urlencoded");    //Specify content-type header
+  http.begin(link); //initiate HTTP request, put your Website URL or Your Computer IP
+  http.addHeader("Content-Type", "application/json");    //Specify content-type header
 
-  http2.begin(wifiClient,link2); //initiate HTTP request, put your Website URL or Your Computer IP
-  http2.addHeader("Content-Type", "application/json");    //Specify content-type header
+  // http2.begin(wifiClient,link2); //initiate HTTP request, put your Website URL or Your Computer IP
+  // http2.addHeader("Content-Type", "application/json");    //Specify content-type header
 
-  int httpCode = http.POST(postData);   //Send the request
+  int httpCode = http.PUT(json_str);   //Send the request
   String payload = http.getString();    //Get the response payload
 
-  int httpCode2 = http2.PUT(putData);   //Send the request
-  String payload2 = http2.getString();    //Get the response payload
+  // int httpCode2 = http2.PUT(putData);   //Send the request
+  // String payload2 = http2.getString();    //Get the response payload
 
   Serial.println(httpCode);   //Print HTTP return code
   Serial.println(payload);    //Print request response payload
-  Serial.println(httpCode2);   //Print HTTP return code
-  Serial.println(postData);   //Post Data
-  Serial.println(payload2);    //Print request response payload
+  // Serial.println(httpCode2);   //Print HTTP return code
+  // Serial.println(putData);   //Post Data
+  // Serial.println(payload2);    //Print request response payload
   Serial.println(finger);     //Print fingerprint ID
 
   if (payload.substring(0, 5) == "login") {
@@ -671,7 +680,7 @@ void SendFingerprintID( int finger ) {
   postData = "";
   putData = "";
   http.end();  //Close connection
-  http2.end();  //Close connection
+  // http2.end();  //Close connection
 }
 //********************Get the Fingerprint ID******************
 int getFingerprintID() {
