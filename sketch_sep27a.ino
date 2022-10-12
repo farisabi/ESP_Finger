@@ -617,7 +617,7 @@ void SendFingerprintID( int finger ) {
   HTTPClient http2;    //Declare object of class HTTPClient
   //Post Data
   postData = "FingerID=" + String(finger); // Add the Fingerprint ID to the Post array in order to send it
-  postData2 = "{\"data\": {\"fp_id\": \"" + String(finger) + "\"}}"; // Add the Fingerprint ID to the Post array in order to send it
+  putData = "{\"data\": {\"fp_id\": \"" + String(finger) + "\"}}"; // Add the Fingerprint ID to the Post array in order to send it
 
   //  WiFiClient client;
   http.begin(wifiClient,link); //initiate HTTP request, put your Website URL or Your Computer IP
@@ -629,7 +629,7 @@ void SendFingerprintID( int finger ) {
   int httpCode = http.POST(postData);   //Send the request
   String payload = http.getString();    //Get the response payload
 
-  int httpCode2 = http2.POST(postData2);   //Send the request
+  int httpCode2 = http2.PUT(putData);   //Send the request
   String payload2 = http2.getString();    //Get the response payload
 
   Serial.println(httpCode);   //Print HTTP return code
