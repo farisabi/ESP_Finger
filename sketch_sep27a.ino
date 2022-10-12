@@ -669,7 +669,9 @@ void SendFingerprintID( int finger ) {
   delay(1000);
 
   postData = "";
+  putData = "";
   http.end();  //Close connection
+  http2.end();  //Close connection
 }
 //********************Get the Fingerprint ID******************
 int getFingerprintID() {
