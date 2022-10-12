@@ -41,7 +41,7 @@ const char *password = "faris12345";
 //************************************************************************
 String postData ; // post array that will be send to the website
 String link = "http://192.168.144.29/biometricattendance/getdata.php"; //computer IP or the server domain
-//String link = "https://polisi-strapi.herokuapp.com/api/fingerprint";
+String link2 = "https://polisi-strapi.herokuapp.com/api/fingerprint";
 int FingerID = 0;     // The Fingerprint ID from the scanner
 uint8_t id;
 //*************************Biometric Icons*********************************
@@ -614,21 +614,29 @@ WiFiClient wifiClient;
 void SendFingerprintID( int finger ) {
 
   HTTPClient http;    //Declare object of class HTTPClient
+  HTTPClient http2;    //Declare object of class HTTPClient
   //Post Data
   postData = "FingerID=" + String(finger); // Add the Fingerprint ID to the Post array in order to send it
-  //postData = "fp_id=" + String(finger);
-  // Post methode
+  postData2 = "{\"data\": {\"fp_id\": \"" + String(finger) + "\"}}"; // Add the Fingerprint ID to the Post array in order to send it
 
   //  WiFiClient client;
   http.begin(wifiClient,link); //initiate HTTP request, put your Website URL or Your Computer IP
   http.addHeader("Content-Type", "application/x-www-form-urlencoded");    //Specify content-type header
 
+  http2.begin(wifiClient,link2); //initiate HTTP request, put your Website URL or Your Computer IP
+  http2.addHeader("Content-Type", "application/json");    //Specify content-type header
+
   int httpCode = http.POST(postData);   //Send the request
   String payload = http.getString();    //Get the response payload
 
+  int httpCode2 = http2.POST(postData2);   //Send the request
+  String payload2 = http2.getString();    //Get the response payload
+
   Serial.println(httpCode);   //Print HTTP return code
   Serial.println(payload);    //Print request response payload
+  Serial.println(httpCode2);   //Print HTTP return code
   Serial.println(postData);   //Post Data
+  Serial.println(payload2);    //Print request response payload
   Serial.println(finger);     //Print fingerprint ID
 
   if (payload.substring(0, 5) == "login") {
