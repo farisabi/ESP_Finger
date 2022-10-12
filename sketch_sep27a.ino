@@ -40,6 +40,7 @@ const char *ssid = "realme6";  //ENTER YOUR WIFI SETTINGS
 const char *password = "faris12345";
 //************************************************************************
 String postData ; // post array that will be send to the website
+String putData ; // put array that will be send to the website
 String link = "http://192.168.144.29/biometricattendance/getdata.php"; //computer IP or the server domain
 String link2 = "https://polisi-strapi.herokuapp.com/api/fingerprint";
 int FingerID = 0;     // The Fingerprint ID from the scanner
